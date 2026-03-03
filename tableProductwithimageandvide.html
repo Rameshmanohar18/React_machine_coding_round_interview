@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Table with Images & Video</title>
+    <meta
+      name="description"
+      content="Accessible responsive product table showcasing product images, thumbnails, and product demo video."
+    />
+    <style>
+      :root {
+        --bg: #f7fafc;
+        --card: #fff;
+        --muted: #6b7280;
+        --accent: #2563eb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
+        background: var(--bg);
+        color: #0f172a;
+        padding: 24px;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+      }
+      p.lead {
+        color: var(--muted);
+        margin-bottom: 18px;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+      }
+
+      /* Responsive table */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead th {
+        font-size: 0.85rem;
+        text-align: left;
+        padding: 12px 10px;
+        border-bottom: 1px solid #e6e9ef;
+        color: var(--muted);
+      }
+      tbody td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eef2f6;
+        vertical-align: middle;
+      }
+
+      /* Product cell */
+      .product {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .thumb {
+        width: 72px;
+        height: 72px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: #eee;
+        display: inline-block;
+      }
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .meta {
+        min-width: 0;
+      }
+      .meta .name {
+        font-weight: 600;
+      }
+      .meta .sku {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .price {
+        font-weight: 700;
+      }
+      .stock.in {
+        color: green;
+      }
+      .stock.out {
+        color: #dc2626;
+      }
+
+      .actions button {
+        background: transparent;
+        border: 1px solid #e6e9ef;
+        padding: 8px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      /* Video thumbnail */
+      .video-thumb {
+        width: 140px;
+        height: 80px;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+      }
+      .video-thumb::after {
+        content: "▶";
+        position: absolute;
+        right: 8px;
+        bottom: 6px;
+        font-size: 18px;
+        color: white;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      }
+      .video-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: brightness(0.9);
+      }
+
+      /* Modal styles */
+      .modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: rgba(2, 6, 23, 0.6);
+        z-index: 60;
+      }
+      .modal.open {
+        display: flex;
+      }
+      .modal .panel {
+        background: var(--card);
+        max-width: 900px;
+        width: 100%;
+        border-radius: 10px;
+        padding: 12px;
+      }
+      .modal .panel header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 8px;
+      }
+      .close {
+        background: transparent;
+        border: 0;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      /* Responsive behavior: collapse into cards on small screens */
+      @media (max-width: 700px) {
+        thead {
+          display: none;
+        }
+        tbody tr {
+          display: block;
+          background: #fff;
+          margin-bottom: 12px;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        tbody td {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        tbody td:before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: var(--muted);
+          font-size: 0.85rem;
+        }
+        .video-thumb {
+          width: 120px;
+          height: 70px;
+        }
+      }
+
+      /* Accessible focus */
+      a,
+      button {
+        outline-color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Product Table — Images & Video</h1>
+      <p class="lead">
+        A responsive, accessible HTML product table that includes product
+        images, thumbnails and an inline demo video (opens in modal). Use this
+        file as a starter and replace sample URLs with your assets.
+      </p>
+
+      <section class="card" aria-labelledby="products-heading">
+        <h2 id="products-heading" style="font-size: 1rem; margin-bottom: 10px">
+          Products
+        </h2>
+
+        <div style="overflow: auto">
+          <table role="table" aria-describedby="products-heading">
+            <thead>
+              <tr>
+                <th scope="col">Product</th>
+                <th scope="col">Price</th>
+                <th scope="col">Stock</th>
+                <th scope="col">Media</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Product 1 -->
+              <tr>
+                <td data-label="Product">
+                  <div class="product">
+                    <span class="thumb">
+                      <img
+                        src="https://images.unsplash.com/photo-1606813902811-0b8f8d4b9f4c?q=80&w=800&auto=format&fit=crop"
+                        alt="Blue running shoes - front view"
+                        loading="lazy"
+                      />
+                    </span>
+                    <div class="meta">
+                      <div class="name">MotionPro Running Shoes</div>
+                      <div class="sku">SKU: MP-4512</div>
+                    </div>
+                  </div>
+                </td>
+                <td data-label="Price" class="price">₹3,499</td>
+                <td data-label="Stock" class="stock in">In stock</td>
+                <td data-label="Media">
+                  <div
+                    class="video-thumb"
+                    tabindex="0"
+                    role="button"
+                    aria-pressed="false"
+                    data-video="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4"
+                    title="Play product demo"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop"
+                      alt="Video thumbnail showing shoes"
+                      loading="lazy"
+                    />
+                  </div>
+                </td>
+                <td data-label="Actions" class="actions">
+                  <button
+                    onclick="addToCart('MP-4512')"
+                    aria-label="Add MotionPro Running Shoes to cart"
+                  >
+                    Add
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Product 2 -->
+              <tr>
+                <td data-label="Product">
+                  <div class="product">
+                    <span class="thumb">
+                      <img
+                        src="https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop"
+                        alt="Wireless headphones"
+                        loading="lazy"
+                      />
+                    </span>
+                    <div class="meta">
+                      <div class="name">AeroSound Wireless Headphones</div>
+                      <div class="sku">SKU: AS-2230</div>
+                    </div>
+                  </div>
+                </td>
+                <td data-label="Price" class="price">₹7,999</td>
+                <td data-label="Stock" class="stock in">In stock</td>
+                <td data-label="Media">
+                  <!-- You could use a short mp4 preview; when clicked, modal plays the real demo -->
+                  <div
+                    class="video-thumb"
+                    tabindex="0"
+                    role="button"
+                    data-video="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4"
+                    title="Play product demo"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1518444028169-2e9d0f9b2eb8?q=80&w=1200&auto=format&fit=crop"
+                      alt="Video thumbnail showing headphones"
+                      loading="lazy"
+                    />
+                  </div>
+                </td>
+                <td data-label="Actions" class="actions">
+                  <button
+                    onclick="addToCart('AS-2230')"
+                    aria-label="Add AeroSound Wireless Headphones to cart"
+                  >
+                    Add
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Product 3: Multiple images gallery -->
+              <tr>
+                <td data-label="Product">
+                  <div class="product">
+                    <span class="thumb">
+                      <img
+                        src="https://images.unsplash.com/photo-1526178613765-9148c9b8d7b4?q=80&w=800&auto=format&fit=crop"
+                        alt="Smartwatch on wrist"
+                        loading="lazy"
+                      />
+                    </span>
+                    <div class="meta">
+                      <div class="name">PulseX Smartwatch</div>
+                      <div class="sku">SKU: PX-900</div>
+                    </div>
+                  </div>
+                </td>
+                <td data-label="Price" class="price">₹12,499</td>
+                <td data-label="Stock" class="stock out">Out of stock</td>
+                <td data-label="Media">
+                  <div
+                    class="video-thumb"
+                    tabindex="0"
+                    role="button"
+                    data-video="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4"
+                    title="Play product demo"
+                  >
+                    <img
+                      src="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=1200&auto=format&fit=crop"
+                      alt="Smartwatch video thumbnail"
+                      loading="lazy"
+                    />
+                  </div>
+                </td>
+                <td data-label="Actions" class="actions">
+                  <button disabled aria-disabled="true">Notify me</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Modal for video playback -->
+    <div
+      id="mediaModal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+    >
+      <div class="panel">
+        <header>
+          <strong id="modalTitle">Product demo</strong>
+          <button class="close" aria-label="Close video" id="closeModal">
+            ✕
+          </button>
+        </header>
+        <div style="padding: 6px 8px">
+          <video
+            id="modalVideo"
+            controls
+            playsinline
+            style="
+              width: 100%;
+              height: auto;
+              max-height: 70vh;
+              background: #000;
+            "
+          >
+            <source src="" type="video/mp4" />
+            Your browser does not support HTML5 video.
+          </video>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Simple interactions: add to cart + modal video
+      function addToCart(sku) {
+        // In real app, you'd call your API. Here we just show a toast-like alert.
+        alert("Added " + sku + " to cart (demo).");
+      }
+
+      // Modal logic
+      const modal = document.getElementById("mediaModal");
+      const video = document.getElementById("modalVideo");
+      const closeBtn = document.getElementById("closeModal");
+      const modalTitle = document.getElementById("modalTitle");
+
+      // Open modal when a .video-thumb clicked or activated via keyboard
+      document.querySelectorAll(".video-thumb").forEach((el) => {
+        el.addEventListener("click", () => openModal(el));
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            openModal(el);
+          }
+        });
+      });
+
+      function openModal(el) {
+        const src = el.getAttribute("data-video");
+        const name = el
+          .closest("tr")
+          .querySelector(".meta .name")
+          .textContent.trim();
+        modalTitle.textContent = name + " — Demo";
+        video.querySelector("source").src = src;
+        video.load();
+        modal.classList.add("open");
+        modal.setAttribute("aria-hidden", "false");
+        // focus trap: focus close button
+        closeBtn.focus();
+      }
+
+      function closeModal() {
+        modal.classList.remove("open");
+        modal.setAttribute("aria-hidden", "true");
+        video.pause();
+        video.currentTime = 0;
+      }
+
+      closeBtn.addEventListener("click", closeModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("open"))
+          closeModal();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Feedback Dialog — Demo</title>
+    <style>
+      :root {
+        --bg: #0f1724;
+        --card: #ffffff;
+        --muted: #6b7280;
+        --accent: #2563eb;
+        --danger: #ef4444;
+        --shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+        --radius: 12px;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+      }
+      body {
+        background: linear-gradient(180deg, #e6f0ff 0%, #fff 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .page {
+        width: 100%;
+        max-width: 960px;
+        background: var(--card);
+        border-radius: 16px;
+        padding: 28px;
+        box-shadow: var(--shadow);
+      }
+
+      /* Trigger */
+      .open-btn {
+        display: inline-block;
+        padding: 10px 16px;
+        border-radius: 8px;
+        background: var(--accent);
+        color: white;
+        border: 0;
+        cursor: pointer;
+        font-weight: 600;
+      }
+
+      /* Backdrop & modal */
+      .backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.45);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        z-index: 999;
+      }
+      .backdrop.show {
+        display: flex;
+      }
+      .modal {
+        width: 100%;
+        max-width: 720px;
+        background: var(--card);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 20px;
+        outline: none;
+        transform: translateY(6px);
+        transition: transform 0.12s ease, opacity 0.12s ease;
+      }
+      header.modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      header.modal-head h2 {
+        margin: 0;
+        font-size: 1.125rem;
+      }
+      .close-btn {
+        background: transparent;
+        border: 0;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--muted);
+      }
+
+      form .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+      label {
+        display: block;
+        font-size: 0.9rem;
+        color: #111;
+        margin-bottom: 6px;
+      }
+      input[type="text"],
+      input[type="email"],
+      textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #e6e9ef;
+        font-size: 0.95rem;
+      }
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      .small {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 12px;
+      }
+      .btn {
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 0;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn.secondary {
+        background: #f3f4f6;
+        color: #111;
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: white;
+      }
+
+      /* rating */
+      .rating {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .star {
+        font-size: 22px;
+        cursor: pointer;
+        user-select: none;
+        line-height: 1;
+      }
+      .star.selected {
+        color: gold;
+      }
+      .rating .sr-only {
+        position: absolute;
+        left: -9999px;
+      }
+
+      /* helper row */
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .error {
+        color: var(--danger);
+        font-size: 0.88rem;
+        margin-top: 8px;
+      }
+
+      /* responsive */
+      @media (max-width: 520px) {
+        .modal {
+          padding: 16px;
+        }
+        .page {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page" aria-labelledby="pageTitle">
+      <h1 id="pageTitle" style="font-size: 1.2rem; margin: 0 0 12px 0">
+        Product Page (demo)
+      </h1>
+      <p class="small" style="margin: 0 0 16px 0">
+        Click the button to open the feedback dialog.
+      </p>
+      <button class="open-btn" id="openFeedback">Give feedback</button>
+    </main>
+
+    <!-- Backdrop + Modal -->
+    <div class="backdrop" id="backdrop" role="presentation" aria-hidden="true">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="dialogTitle"
+        aria-describedby="dialogDesc"
+        tabindex="-1"
+        id="feedbackModal"
+      >
+        <header class="modal-head">
+          <div>
+            <h2 id="dialogTitle">Send Feedback</h2>
+            <p id="dialogDesc" class="small" style="margin: 4px 0 0 0">
+              Tell us what you liked or how we can improve.
+            </p>
+          </div>
+          <button
+            class="close-btn"
+            aria-label="Close feedback dialog"
+            id="closeX"
+          >
+            &times;
+          </button>
+        </header>
+
+        <form id="feedbackForm" novalidate>
+          <div class="row" style="align-items: flex-end">
+            <div style="flex: 1 1 220px; min-width: 180px">
+              <label for="name"
+                >Name
+                <span class="small" aria-hidden="true">(optional)</span></label
+              >
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Your name"
+              />
+            </div>
+            <div style="flex: 1 1 260px; min-width: 180px">
+              <label for="email"
+                >Email <span class="small">(optional)</span></label
+              >
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                inputmode="email"
+                autocomplete="email"
+              />
+            </div>
+          </div>
+
+          <div style="margin-bottom: 8px">
+            <label for="rating">Rating</label>
+            <div class="rating" id="rating" aria-label="Rating (1 to 5)">
+              <button
+                type="button"
+                class="star"
+                data-value="1"
+                aria-label="1 star"
+              >
+                ☆
+              </button>
+              <button
+                type="button"
+                class="star"
+                data-value="2"
+                aria-label="2 stars"
+              >
+                ☆
+              </button>
+              <button
+                type="button"
+                class="star"
+                data-value="3"
+                aria-label="3 stars"
+              >
+                ☆
+              </button>
+              <button
+                type="button"
+                class="star"
+                data-value="4"
+                aria-label="4 stars"
+              >
+                ☆
+              </button>
+              <button
+                type="button"
+                class="star"
+                data-value="5"
+                aria-label="5 stars"
+              >
+                ☆
+              </button>
+              <span class="small" id="ratingHint" style="margin-left: 8px"
+                >No rating yet</span
+              >
+              <input
+                type="hidden"
+                name="rating_value"
+                id="rating_value"
+                value=""
+              />
+            </div>
+          </div>
+
+          <div style="margin-top: 8px">
+            <label for="comments"
+              >Comments <span class="small">(required)</span></label
+            >
+            <textarea
+              id="comments"
+              name="comments"
+              required
+              minlength="10"
+              maxlength="1000"
+              placeholder="Tell us what you think..."
+            ></textarea>
+            <div class="meta">
+              <div class="small" id="charCount">0 / 1000</div>
+              <div class="small" aria-hidden="true">Minimum 10 characters</div>
+            </div>
+          </div>
+
+          <div
+            style="
+              margin-top: 10px;
+              display: flex;
+              gap: 10px;
+              align-items: center;
+              flex-wrap: wrap;
+            "
+          >
+            <label class="small" for="screenshot">Attach (optional)</label>
+            <input
+              id="screenshot"
+              name="screenshot"
+              type="file"
+              accept="image/*"
+              aria-describedby="fileHelp"
+            />
+            <div id="fileHelp" class="small">
+              PNG, JPG — max 5MB (client-side limited)
+            </div>
+          </div>
+
+          <div
+            id="errorBox"
+            class="error"
+            role="alert"
+            aria-live="polite"
+            style="display: none"
+          ></div>
+
+          <div class="actions" style="margin-top: 16px">
+            <button type="button" class="btn secondary" id="cancelBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary" id="submitBtn">
+              Send feedback
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      /* Basic modal + accessibility behavior, focus trap, star rating, simple validation */
+      (() => {
+        const openBtn = document.getElementById("openFeedback");
+        const backdrop = document.getElementById("backdrop");
+        const modal = document.getElementById("feedbackModal");
+        const closeX = document.getElementById("closeX");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const form = document.getElementById("feedbackForm");
+        const comments = document.getElementById("comments");
+        const charCount = document.getElementById("charCount");
+        const errorBox = document.getElementById("errorBox");
+        const ratingStars = Array.from(document.querySelectorAll(".star"));
+        const ratingValue = document.getElementById("rating_value");
+        const ratingHint = document.getElementById("ratingHint");
+        const fileInput = document.getElementById("screenshot");
+
+        let lastFocused = null;
+
+        function openModal() {
+          lastFocused = document.activeElement;
+          backdrop.classList.add("show");
+          backdrop.setAttribute("aria-hidden", "false");
+          modal.focus();
+          trapFocus();
+          document.addEventListener("keydown", onKeyDown);
+        }
+
+        function closeModal() {
+          backdrop.classList.remove("show");
+          backdrop.setAttribute("aria-hidden", "true");
+          errorBox.style.display = "none";
+          document.removeEventListener("keydown", onKeyDown);
+          releaseFocusTrap();
+          if (lastFocused) lastFocused.focus();
+          form.reset();
+          ratingValue.value = "";
+          updateRatingDisplay(0);
+          charCount.textContent = "0 / 1000";
+        }
+
+        openBtn.addEventListener("click", openModal);
+        closeX.addEventListener("click", closeModal);
+        cancelBtn.addEventListener("click", closeModal);
+
+        backdrop.addEventListener("click", (e) => {
+          if (e.target === backdrop) closeModal(); // click outside closes
+        });
+
+        function onKeyDown(e) {
+          if (e.key === "Escape") closeModal();
+        }
+
+        // Simple focus trap (keeps focus inside modal)
+        let focusable = [];
+        let firstFocusable = null,
+          lastFocusable = null;
+        function trapFocus() {
+          focusable = modal.querySelectorAll(
+            'button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])'
+          );
+          if (focusable.length === 0) return;
+          firstFocusable = focusable[0];
+          lastFocusable = focusable[focusable.length - 1];
+          modal.addEventListener("keydown", handleTrap);
+        }
+        function handleTrap(e) {
+          if (e.key !== "Tab") return;
+          if (e.shiftKey) {
+            if (document.activeElement === firstFocusable) {
+              e.preventDefault();
+              lastFocusable.focus();
+            }
+          } else {
+            if (document.activeElement === lastFocusable) {
+              e.preventDefault();
+              firstFocusable.focus();
+            }
+          }
+        }
+        function releaseFocusTrap() {
+          modal.removeEventListener("keydown", handleTrap);
+        }
+
+        // Star rating
+        function updateRatingDisplay(val) {
+          ratingStars.forEach((btn) => {
+            const v = Number(btn.dataset.value);
+            btn.textContent = v <= val ? "★" : "☆";
+            btn.classList.toggle("selected", v <= val);
+          });
+          ratingHint.textContent = val ? `${val} / 5` : "No rating yet";
+          ratingValue.value = val || "";
+        }
+        ratingStars.forEach((st) => {
+          st.addEventListener("click", () => {
+            const v = Number(st.dataset.value);
+            updateRatingDisplay(v);
+          });
+          st.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              st.click();
+            }
+          });
+        });
+
+        // character counter for comments
+        comments.addEventListener("input", () => {
+          const len = comments.value.length;
+          charCount.textContent = `${len} / ${comments.maxLength || 1000}`;
+        });
+
+        // client-side file size check (approx)
+        fileInput.addEventListener("change", () => {
+          const f = fileInput.files[0];
+          if (!f) return;
+          const maxBytes = 5 * 1024 * 1024; // 5MB
+          if (f.size > maxBytes) {
+            errorBox.textContent =
+              "File is too large. Please upload images smaller than 5MB.";
+            errorBox.style.display = "block";
+            fileInput.value = "";
+          } else {
+            errorBox.style.display = "none";
+          }
+        });
+
+        // simple form submit (demo — replace with actual network call)
+        form.addEventListener("submit", (e) => {
+          e.preventDefault();
+          errorBox.style.display = "none";
+          const commentsVal = comments.value.trim();
+          const ratingVal = ratingValue.value;
+          // validation
+          if (commentsVal.length < 10) {
+            errorBox.textContent =
+              "Comments are required (at least 10 characters).";
+            errorBox.style.display = "block";
+            comments.focus();
+            return;
+          }
+          if (!ratingVal) {
+            // rating optional here — change if required
+          }
+
+          // Build a FormData for demonstration (would be sent to server)
+          const fd = new FormData(form);
+          // add simulated metadata
+          fd.set("page", window.location.pathname || "demo-page");
+
+          // Demo: show the collected values in console and show a success state
+          console.log("Collected feedback (demo):");
+          for (const [k, v] of fd.entries()) {
+            console.log(k, v);
+          }
+
+          // Replace the submit button content to indicate submission
+          const submitBtn = document.getElementById("submitBtn");
+          submitBtn.disabled = true;
+          submitBtn.textContent = "Sending...";
+
+          // Simulate network latency then close modal + show toast (demo)
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Send feedback";
+            closeModal();
+            // lightweight toast
+            showToast("Thanks — your feedback was sent (demo).");
+          }, 900);
+        });
+
+        // small toast
+        function showToast(msg) {
+          const t = document.createElement("div");
+          t.textContent = msg;
+          t.style.position = "fixed";
+          t.style.right = "18px";
+          t.style.bottom = "18px";
+          t.style.background = "rgba(0,0,0,0.8)";
+          t.style.color = "white";
+          t.style.padding = "10px 14px";
+          t.style.borderRadius = "10px";
+          t.style.zIndex = 1200;
+          document.body.appendChild(t);
+          setTimeout(() => (t.style.opacity = "0.95"), 20);
+          setTimeout(() => {
+            t.style.transition = "transform .25s ease,opacity .25s ease";
+            t.style.opacity = "0";
+            t.style.transform = "translateY(10px)";
+          }, 2200);
+          setTimeout(() => t.remove(), 2600);
+        }
+
+        // Accessibility: ensure modal gets focus on open
+        modal.addEventListener("keydown", (e) => {
+          // allow arrow keys to move rating when focus inside rating region
+          if (
+            ["ArrowLeft", "ArrowRight"].includes(e.key) &&
+            document.activeElement.closest(".rating")
+          ) {
+            e.preventDefault();
+            // determine current and next
+            const cur = Number(ratingValue.value) || 0;
+            const next =
+              e.key === "ArrowRight"
+                ? Math.min(5, cur + 1)
+                : Math.max(1, cur - 1 || 0);
+            updateRatingDisplay(next);
+          }
+        });
+
+        // Ensure modal doesn't accidentally close on form controls via Enter (only when intended)
+        form.addEventListener("keydown", (e) => {
+          if (
+            e.key === "Enter" &&
+            e.target.tagName === "INPUT" &&
+            e.target.type === "text"
+          ) {
+            // allow
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

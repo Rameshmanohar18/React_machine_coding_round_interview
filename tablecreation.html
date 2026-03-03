@@ -1,0 +1,194 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Responsive Table Demo</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .table-container {
+        overflow-x: auto;
+        background: #fff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 600px; /* ensures some horizontal scroll on small screens */
+      }
+
+      th,
+      td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background: linear-gradient(90deg, #4a90e2, #357abd);
+        color: white;
+        font-weight: bold;
+      }
+
+      tbody tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+
+      tbody tr:hover {
+        background: #e1f0ff;
+      }
+
+      tfoot td {
+        font-weight: bold;
+        background: #f0f0f0;
+      }
+
+      caption {
+        caption-side: top;
+        font-weight: bold;
+        font-size: 1.4em;
+        padding-bottom: 10px;
+        text-align: left;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+        table,
+        thead,
+        tbody,
+        th,
+        td,
+        tr {
+          display: block;
+        }
+
+        thead tr {
+          display: none; /* hide headers on small screens */
+        }
+
+        tr {
+          margin-bottom: 15px;
+          border-bottom: 2px solid #ddd;
+        }
+
+        td {
+          padding: 10px;
+          text-align: right;
+          position: relative;
+        }
+
+        td::before {
+          content: attr(data-label);
+          position: absolute;
+          left: 15px;
+          width: 50%;
+          padding-left: 5px;
+          font-weight: bold;
+          text-align: left;
+        }
+
+        tfoot {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Employee Dashboard - Responsive Table</h1>
+
+    <div class="table-container">
+      <table>
+        <caption>
+          Employee Details with Departments, Roles, and Salaries
+        </caption>
+
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Department</th>
+            <th scope="col">Role</th>
+            <th scope="col">Location</th>
+            <th scope="col">Salary</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td data-label="Name">Ramesh</td>
+            <td data-label="Department">Development</td>
+            <td data-label="Role">Frontend Developer</td>
+            <td data-label="Location">Chennai</td>
+            <td data-label="Salary">$2000</td>
+            <td data-label="Status">Active</td>
+          </tr>
+
+          <tr>
+            <td data-label="Name">Jane</td>
+            <td data-label="Department">Design</td>
+            <td data-label="Role">UI/UX Designer</td>
+            <td data-label="Location">Bangalore</td>
+            <td data-label="Salary">$1800</td>
+            <td data-label="Status">Active</td>
+          </tr>
+
+          <tr>
+            <td data-label="Name" rowspan="2">Mark</td>
+            <td data-label="Department">Development</td>
+            <td data-label="Role">Backend Developer</td>
+            <td data-label="Location">Mumbai</td>
+            <td data-label="Salary">$2200</td>
+            <td data-label="Status">Active</td>
+          </tr>
+
+          <tr>
+            <td data-label="Department">QA</td>
+            <td data-label="Role">Tester</td>
+            <td data-label="Location">Mumbai</td>
+            <td data-label="Salary">$1500</td>
+            <td data-label="Status">Inactive</td>
+          </tr>
+
+          <tr>
+            <td data-label="Name">Lucy</td>
+            <td data-label="Department" colspan="2">Marketing</td>
+            <td data-label="Location">Delhi</td>
+            <td data-label="Salary">$1900</td>
+            <td data-label="Status">Active</td>
+          </tr>
+
+          <tr>
+            <td data-label="Name">Sam</td>
+            <td data-label="Department">HR</td>
+            <td data-label="Role">Recruiter</td>
+            <td data-label="Location">Chennai</td>
+            <td data-label="Salary">$1700</td>
+            <td data-label="Status">Active</td>
+          </tr>
+        </tbody>
+
+        <tfoot>
+          <tr>
+            <td colspan="4">Total Employees</td>
+            <td colspan="2">6</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </body>
+</html>

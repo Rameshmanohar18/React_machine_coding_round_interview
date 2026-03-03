@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Product Table with Carousel, Search & Pagination</title>
+    <style>
+      :root {
+        --bg: #f7fafc;
+        --card: #fff;
+        --muted: #6b7280;
+        --accent: #2563eb;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial;
+        background: var(--bg);
+        color: #0f172a;
+        padding: 24px;
+        margin: 0;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: 1.6rem;
+        margin-bottom: 8px;
+      }
+      p.lead {
+        color: var(--muted);
+        margin-bottom: 20px;
+      }
+
+      .carousel {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        margin-bottom: 24px;
+      }
+      .carousel-track {
+        display: flex;
+        transition: transform 0.6s ease-in-out;
+      }
+      .carousel-slide {
+        min-width: 100%;
+        position: relative;
+      }
+      .carousel-slide img {
+        width: 100%;
+        height: 380px;
+        object-fit: cover;
+        display: block;
+      }
+      .carousel button {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.4);
+        color: #fff;
+        border: none;
+        font-size: 24px;
+        padding: 8px 14px;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+      .carousel button.prev {
+        left: 10px;
+      }
+      .carousel button.next {
+        right: 10px;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+      }
+      input[type="search"] {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-size: 1rem;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead th {
+        font-size: 0.85rem;
+        text-align: left;
+        padding: 12px 10px;
+        border-bottom: 1px solid #e6e9ef;
+        color: var(--muted);
+      }
+      tbody td {
+        padding: 12px 10px;
+        border-bottom: 1px solid #eef2f6;
+        vertical-align: middle;
+      }
+
+      .product {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .thumb {
+        width: 72px;
+        height: 72px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: #eee;
+      }
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .meta .name {
+        font-weight: 600;
+      }
+      .meta .sku {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      .price {
+        font-weight: 700;
+      }
+      .stock.in {
+        color: green;
+      }
+      .stock.out {
+        color: #dc2626;
+      }
+
+      .video-thumb {
+        width: 140px;
+        height: 80px;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        position: relative;
+      }
+      .video-thumb::after {
+        content: "▶";
+        position: absolute;
+        right: 8px;
+        bottom: 6px;
+        font-size: 18px;
+        color: white;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+      }
+      .video-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        filter: brightness(0.9);
+      }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        margin-top: 16px;
+      }
+      .pagination button {
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+      }
+      .pagination button.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+
+      @media (max-width: 700px) {
+        thead {
+          display: none;
+        }
+        tbody tr {
+          display: block;
+          margin-bottom: 12px;
+          background: #fff;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        tbody td {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 12px;
+        }
+        tbody td:before {
+          content: attr(data-label);
+          font-weight: 600;
+          color: var(--muted);
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Shop Home — Featured Products</h1>
+      <div class="carousel" id="carousel">
+        <div class="carousel-track">
+          <div class="carousel-slide">
+            <img
+              src="https://images.unsplash.com/photo-1606813902811-0b8f8d4b9f4c?q=80&w=1200&auto=format&fit=crop"
+              alt="Shoes"
+            />
+          </div>
+          <div class="carousel-slide">
+            <img
+              src="https://images.unsplash.com/photo-1518444028169-2e9d0f9b2eb8?q=80&w=1200&auto=format&fit=crop"
+              alt="Headphones"
+            />
+          </div>
+          <div class="carousel-slide">
+            <img
+              src="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=1200&auto=format&fit=crop"
+              alt="Smartwatch"
+            />
+          </div>
+        </div>
+        <button class="prev">❮</button>
+        <button class="next">❯</button>
+      </div>
+
+      <section class="card">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search products..."
+          aria-label="Search products"
+        />
+        <div style="overflow: auto">
+          <table id="productTable">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Media</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </section>
+    </div>
+
+    <!-- Modal for video -->
+    <div
+      id="mediaModal"
+      style="
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+      "
+    >
+      <div
+        style="
+          background: #fff;
+          padding: 12px;
+          border-radius: 8px;
+          max-width: 800px;
+          width: 100%;
+        "
+      >
+        <div style="text-align: right"><button id="closeModal">✕</button></div>
+        <video
+          id="modalVideo"
+          controls
+          style="width: 100%; max-height: 70vh"
+        ></video>
+      </div>
+    </div>
+
+    <script>
+      const slides = document.querySelectorAll(".carousel-slide");
+      const track = document.querySelector(".carousel-track");
+      const nextBtn = document.querySelector(".next");
+      const prevBtn = document.querySelector(".prev");
+      let currentSlide = 0;
+
+      function updateCarousel() {
+        track.style.transform = `translateX(-${currentSlide * 100}%)`;
+      }
+      nextBtn.addEventListener("click", () => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        updateCarousel();
+      });
+      prevBtn.addEventListener("click", () => {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        updateCarousel();
+      });
+      setInterval(() => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        updateCarousel();
+      }, 5000);
+
+      const products = [
+        {
+          name: "MotionPro Running Shoes",
+          sku: "MP-4512",
+          price: "₹3,499",
+          stock: "In stock",
+          img: "https://images.unsplash.com/photo-1606813902811-0b8f8d4b9f4c?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+        {
+          name: "AeroSound Wireless Headphones",
+          sku: "AS-2230",
+          price: "₹7,999",
+          stock: "In stock",
+          img: "https://images.unsplash.com/photo-1518444028169-2e9d0f9b2eb8?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+        {
+          name: "PulseX Smartwatch",
+          sku: "PX-900",
+          price: "₹12,499",
+          stock: "Out of stock",
+          img: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+        {
+          name: "Lumina Desk Lamp",
+          sku: "LD-100",
+          price: "₹2,199",
+          stock: "In stock",
+          img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+        {
+          name: "FitFuel Blender Bottle",
+          sku: "FB-340",
+          price: "₹899",
+          stock: "In stock",
+          img: "https://images.unsplash.com/photo-1606813902811-0b8f8d4b9f4c?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+        {
+          name: "TechNest Laptop Stand",
+          sku: "TN-200",
+          price: "₹1,499",
+          stock: "In stock",
+          img: "https://images.unsplash.com/photo-1593642634315-48f5414c3ad9?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+        {
+          name: "CloudBuds Earphones",
+          sku: "CB-210",
+          price: "₹1,299",
+          stock: "Out of stock",
+          img: "https://images.unsplash.com/photo-1596079890746-1d1d21f36d50?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+        {
+          name: "Glide Wireless Mouse",
+          sku: "GW-450",
+          price: "₹799",
+          stock: "In stock",
+          img: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b1b?q=80&w=800&auto=format&fit=crop",
+          video:
+            "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4",
+        },
+      ];
+
+      const rowsPerPage = 3;
+      let currentPage = 1;
+      const tableBody = document.getElementById("tableBody");
+      const pagination = document.getElementById("pagination");
+
+      function displayTable(data) {
+        tableBody.innerHTML = "";
+        const start = (currentPage - 1) * rowsPerPage;
+        const items = data.slice(start, start + rowsPerPage);
+        for (const p of items) {
+          tableBody.innerHTML += `<tr>
+          <td data-label='Product'><div class='product'><span class='thumb'><img src='${
+            p.img
+          }' alt='${p.name}'></span><div class='meta'><div class='name'>${
+            p.name
+          }</div><div class='sku'>${p.sku}</div></div></div></td>
+          <td data-label='Price' class='price'>${p.price}</td>
+          <td data-label='Stock' class='stock ${
+            p.stock.includes("Out") ? "out" : "in"
+          }'>${p.stock}</td>
+          <td data-label='Media'><div class='video-thumb' data-video='${
+            p.video
+          }'><img src='${p.img}' alt='Video of ${p.name}'></div></td>
+        </tr>`;
+        }
+        setupVideo();
+      }
+
+      function setupVideo() {
+        document.querySelectorAll(".video-thumb").forEach((el) => {
+          el.addEventListener("click", () => {
+            document.getElementById("modalVideo").src =
+              el.getAttribute("data-video");
+            document.getElementById("mediaModal").style.display = "flex";
+          });
+        });
+      }
+
+      function setupPagination(data) {
+        pagination.innerHTML = "";
+        const pageCount = Math.ceil(data.length / rowsPerPage);
+        for (let i = 1; i <= pageCount; i++) {
+          const btn = document.createElement("button");
+          btn.textContent = i;
+          if (i === currentPage) btn.classList.add("active");
+          btn.addEventListener("click", () => {
+            currentPage = i;
+            displayTable(data);
+            setupPagination(data);
+          });
+          pagination.appendChild(btn);
+        }
+      }
+
+      document.getElementById("closeModal").addEventListener("click", () => {
+        document.getElementById("mediaModal").style.display = "none";
+        document.getElementById("modalVideo").pause();
+      });
+
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        const val = e.target.value.toLowerCase();
+        const filtered = products.filter(
+          (p) =>
+            p.name.toLowerCase().includes(val) ||
+            p.sku.toLowerCase().includes(val)
+        );
+        currentPage = 1;
+        displayTable(filtered);
+        setupPagination(filtered);
+      });
+
+      displayTable(products);
+      setupPagination(products);
+    </script>
+  </body>
+</html>

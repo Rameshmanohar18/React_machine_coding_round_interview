@@ -39,6 +39,8 @@ import Skeleton from "./Components/Skeltion";
 import SkeltonComponent from "./Components/SkeltonComponent";
 import DataFetcher from "./Components/DataFetcher";
 
+import FileUpload from "./Components/File_upload";
+
 function App() {
   return (
     <>
@@ -85,11 +87,12 @@ function App() {
         <Link to="/controlledcomponent">22-Controlled Component</Link>
         <Link to="/debounce">23-Debounce Example</Link>
         <Link to="/DecemberuseEffect">24-December useEffect </Link>
-        <Link to="/APIPolling">API Polling Example</Link>
-        <Link to="/Skeleton">Skelton Loading Example</Link>
-        <Link to="/skeltoncomponent">Skelton Component Example</Link>
-        <Link to="/ProgressButton">Progress Button Example</Link>
-        <Link to="/DataFetcher">Data Fetcher Example</Link>
+        <Link to="/APIPolling">25-API Polling Example</Link>
+        <Link to="/Skeleton">26-Skelton Loading Example</Link>
+        <Link to="/skeltoncomponent">27-Skelton Component Example</Link>
+        <Link to="/ProgressButton">28-Progress Button Example</Link>
+        <Link to="/DataFetcher">29-Data Fetcher Example</Link>
+        <Link to="/FileUpload">30-File upload</Link>
       </nav>
       <Routes>
         <Route path="/password" element={<PasswordToggle />} />
@@ -130,7 +133,9 @@ function App() {
         <Route path="/Controlled" element={<ControlledUncontrolled />} />
 
         <Route path="/debounce" element={<Debounce />} />
-        <Route path="/DecemberuseEffect" element={<DecemberuseEffect />} /> <Route path="/DataFetcher/" element={<DataFetcher />} /> 
+        <Route path="/DecemberuseEffect" element={<DecemberuseEffect />} />
+         <Route path="/DataFetcher/" element={<DataFetcher />} /> 
+         <Route path="/FileUpload" element={<FileUpload/>}/>
       </Routes>
       <Footer />
     </>

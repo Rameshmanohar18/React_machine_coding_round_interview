@@ -1,12 +1,13 @@
-/* :root {
+:root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
   color-scheme: dark;
-  color: #ffffff;
+  color: #50a51f;
 
-  background: linear-gradient(120deg, #1f1c2c, #928dab);
+  background: linear-gradient(120deg, #2f1b87, #928dab);
 
   min-height: 100vh;
-} */
+}
+/* @import "tailwindcss"; */

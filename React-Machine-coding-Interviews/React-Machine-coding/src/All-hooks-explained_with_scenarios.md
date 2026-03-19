@@ -604,6 +604,20 @@ function ImageGallery() {
 }
 ```
 
+<!-------------------------------
+
+
+
+
+useEffect Hooks
+
+
+
+
+
+
+ ------------------------------>
+
 ## **2. useEffect Hook - 25+ Scenarios**
 
 ```jsx
@@ -1345,7 +1359,19 @@ I'll continue with the other hooks (useContext, useReducer, useCallback, useMemo
 
 This is already getting very long. Would you like me to continue with the remaining hooks?
 
-<!-------------
+<!------------------------------
+
+
+
+
+
+
+
+
+
+
+## **3. useContext Hook - 25+ Scenarios**
+
 
 
 
